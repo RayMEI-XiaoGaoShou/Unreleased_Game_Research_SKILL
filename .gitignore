@@ -1,0 +1,24 @@
+# Root-level local artifacts and one-off analysis docs
+%TEMP%/
+*.log
+ps.txt
+section2.log
+section2_rerun.log
+section3.log
+
+# One-off local research inputs / exports
+_tmp_game_feature_framework.txt
+section-4_section_4_shortlist.csv
+test_heredoc.txt
+test_tmp.txt
+游戏特性分析框架.docx
+游戏特性分析框架.txt
+白银之城 PV+实机观众反馈数据分析 & 个人观感【LU_12_23】 (1).pdf
+
+# Skill-local temporary artifacts
+unreleased-game-research/tmp_*
+unreleased-game-research/scripts/__pycache__/
+
+# Internal dev-session coordination docs (not part of public skill)
+unreleased-game-research/PARALLEL_SESSION_PROTOCOL.md
+unreleased-game-research/SESSION_STATUS.md
