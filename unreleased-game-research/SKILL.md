@@ -272,16 +272,32 @@ Agent requirements for Section 4 deep analysis:
 
 ## Interactive Intake Flow
 
-When the user says something like "分析《xxx》游戏" or asks to run this skill end-to-end, you (the AI Agent) must act as the **Frontend Coordinator**. DO NOT run the Python scripts immediately. DO NOT dump all requests for inputs at once. 
+When the user says something like "分析《xxx》游戏" or asks to run this skill end-to-end, you (the AI Agent) must act as the **Frontend Coordinator**.
+
+### ⛔ HARD RULES — READ BEFORE DOING ANYTHING
+
+> **RULE 1 — NO EARLY EXECUTION:**
+> You MUST NOT call any Python script, run any section runner, or invoke any backend tool until **Turn 5 is fully complete** and the user has explicitly confirmed all inputs. Collecting Section 2 inputs in Turn 2 does NOT give you permission to start Section 2. Collecting Section 3 inputs in Turn 3 does NOT give you permission to start Section 3. The one and only moment you may launch any execution is the end of Turn 5.
+
+> **RULE 2 — ONE LAUNCH, ALL AT ONCE:**
+> Sections 2, 3, and 4 must launch **simultaneously in a single parallel call** at the end of Turn 5. Never launch them one-by-one as their inputs arrive. The purpose of Turn 1–5 is purely input collection. Execution begins only after all inputs are gathered.
+
+> **RULE 3 — SECTION 4 VIDEO CONFIRMATION IS MANDATORY:**
+> If the user asks you to search for Section 4 candidate videos, you MUST run `scripts/search_section_4_candidates.py`, then **show the results to the user and wait for their explicit video selection confirmation**. You MUST NOT proceed to Section 4 execution until the user has replied with which videos to include.
+
+> **RULE 4 — VOLCENGINE API KEY IS REQUIRED BEFORE TRANSCRIPTION:**
+> You MUST NOT start any Section 4 transcription without a Volcano Engine API Key explicitly provided by the user. If the user has not provided one, ask again before proceeding. Do not use any default, placeholder, or auto fallback provider for Section 4 transcription.
+
+---
 
 You MUST follow this exact **Multi-turn Progressive Intake Flow** in Chinese:
 
 ### Turn 1: Initialization & Section 2 (Official Video)
 1. **Confirm Game Name**: "好的，我将为您深入分析《xxx》这款未上线游戏。"
-2. **Explain 4 Sections Briefly**: Briefly list the 4 dimensions you will analyze (Public Intel, Official Video Comments, Player Reviews, Creator Reviews). 
-3. **Start Section 1 Background Task**: Tell the user you will start searching for Public Intel globally right now. **(Agent MUST start using web search, explore, librarian agents immediately in parallel to gather developer info, test timelines, and core gameplay features).**
+2. **Explain 4 Sections & Flow**: Briefly explain the 4 dimensions (Public Intel, Official Video Comments, Player Reviews, Creator Reviews) and tell the user: "我会先用 Turn 1~5 与您逐步确认 Section 2~4 所需的全部信息，信息收集完毕后，再**一次性并行启动** Section 2、3、4 的分析，最后汇总生成综合报告。"
+3. **Start Section 1 Background Task**: Tell the user you will start searching for Public Intel globally right now. **(Agent MUST start using web search immediately in parallel to gather developer info, test timelines, and core gameplay features — this runs in background throughout Turn 1–5.)**
 4. **Ask for Section 2 Inputs**: Ask the user: "首先是【官方视频评论分析】。请问您想分析哪个平台的官方视频？(1) YouTube (2) B站 (3) 都有 (4) 跳过此项"
-*(Wait for user response)*
+*(Wait for user response — DO NOT start any section execution)*
 
 ### Turn 2: Section 2 Credentials Guide
 1. **Provide Conditional Guide**: 
@@ -290,12 +306,12 @@ You MUST follow this exact **Multi-turn Progressive Intake Flow** in Chinese:
    - If both: Provide both guides.
    - If skip: Proceed to Turn 3 immediately.
 2. **Provide the Copy-Paste Template**: After the guide, provide the exact credential template block for the user to fill out, along with asking for the video URLs.
-*(Wait for user to paste credentials and URLs)*
+*(Wait for user to paste credentials and URLs — DO NOT start any section execution)*
 
 ### Turn 3: Section 3 (Homepage Reviews)
 1. **Acknowledge**: "收到官方视频信息！接下来是【玩家主页/预约评价分析】。"
 2. **Ask for Section 3 Inputs**: "请问您想抓取哪个平台的玩家评价？(1) TapTap (2) B站游戏中心 (3) 跳过此项"
-*(Wait for user response)*
+*(Wait for user response — DO NOT start any section execution)*
 
 ### Turn 4: Section 3 Guide & Section 4 (Creator Reviews)
 1. **Conditional Section 3 Guide**:
@@ -304,21 +320,35 @@ You MUST follow this exact **Multi-turn Progressive Intake Flow** in Chinese:
 2. **Ask for Section 4 Inputs & ASR Setup**: 
    - Explain to the user: "最后是【创作者评测分析】。这部分我们需要将视频转为文字以便深度分析。我们默认使用**火山引擎 ASR**，原因如下：\n  1. **配置极其简单**：纯 API 调用，不需要本地配置复杂的 Python 或 GPU 环境。\n  2. **新用户白嫖额度**：新用户开通即送 20 小时免费转录额度（即使超额，价格也仅需约 2.3元/小时）。\n  3. **精准度高**：内置标点与智能断句，非常适合评测分析。"
    - Provide the setup guide:
-     "**【火山引擎 API Key 获取指南】**\n     1. 登录 [火山引擎控制台](https://console.volcengine.com/)\n     2. 搜索并开通 **语音技术** -> **大模型录音文件识别**（注意是录音文件识别，非流式）\n     3. 在控制台左侧导航栏找到“应用管理”或“凭证管理”，生成你的 `API Key`（注意：不需要 AppID，只需要 API Key 即可）。"
+     "**【火山引擎 API Key 获取指南】**\n     1. 登录 [火山引擎控制台](https://console.volcengine.com/)\n     2. 搜索并开通 **语音技术** -> **大模型录音文件识别**（注意是录音文件识别，非流式）\n     3. 在控制台左侧导航栏找到"应用管理"或"凭证管理"，生成你的 `API Key`（注意：不需要 AppID，只需要 API Key 即可）。"
    - Ask for their inputs: "请问您是否已经有想要分析的 UP主/主播视频清单？如果没有，我可以帮您自动搜索候选名单。(1) 我有清单 (2) 请帮我搜索候选 (3) 跳过此项。请将您的选择，以及火山引擎 API Key 一并发送给我。"
-*(Wait for user response)*
+*(Wait for user response — DO NOT start any section execution)*
 
-### Turn 5: Section 4 Resolution & Launch
-1. **Resolve Section 4**: 
-   - If they have a list, ask for the CSV file path containing the video URLs/IDs.
-   - If they want you to search, run `scripts/search_section_4_candidates.py` in the background, show them the top 5 results, and ask them to confirm.
-2. **Launch Backend Orchestrator**: Once all interactive inputs are collected, execute the master runner `scripts/run_research.py` in headless mode using the `--yes` and `--parallel` flags, passing all collected arguments (including `--volcengine-api-key`).
-3. **Agent Research (Section 1)**: Make sure your background Web Search for Section 1 (developer, publisher, timeline, product features) is complete. Write the structured intelligence to `projects/<game_slug>/section_1_data.json` so the backend can pick it up.
-   - The JSON MUST include a `facts` array for hard facts (with source tracking).
-   - The JSON MUST include a `findings` string structured exactly like the **Module B: 游戏具体分析框架** (including 基础信息, 多维度评估产品, 核心乐趣与品类定位, 品类基准比较, 品类趋势).
-   - **Do not send unverified claims**. If info is missing, write "根据目前公开信息，暂无相关报道" in the `findings`.
+### Turn 5: Section 4 Video Confirmation & Parallel Launch
 
-The Python backend will then safely orchestrate all sections in parallel.
+#### Step A — Resolve Section 4 Video List
+- **If user has their own list**: Ask them to paste the video URLs/IDs or CSV file path. Wait for them to provide it.
+- **If user wants you to search**: Run `scripts/search_section_4_candidates.py` in background. Once results are ready, **show the top candidates to the user and ask: "以上是我找到的候选视频，请告诉我您希望保留哪几个（例如回复序号 1、3、5），确认后我将开始正式执行分析。"** ⛔ **DO NOT proceed until the user has replied with their confirmed video selection.**
+- **If user skips Section 4**: Note it and proceed without Section 4.
+
+#### Step B — Verify Volcano Engine API Key
+- ⛔ **If Section 4 is not skipped and no Volcano Engine API Key has been provided**, explicitly ask: "请提供您的火山引擎 API Key，没有这个 Key 我无法进行视频转录，Section 4 将无法执行。" **DO NOT proceed to Step C until the key is explicitly provided.**
+
+#### Step C — Parallel Launch (THE ONE AND ONLY LAUNCH MOMENT)
+Once ALL of the following are confirmed:
+- ✅ Section 2 credentials + video URLs (or skipped)
+- ✅ Section 3 page URL / cURL bundle (or skipped)
+- ✅ Section 4 confirmed video list + Volcano Engine API Key (or skipped)
+
+**Only now**, execute the master runner `scripts/run_research.py` in headless mode using the `--parallel` flag, passing all collected arguments simultaneously. Tell the user: "所有信息已收齐，现在开始并行启动 Section 2、3、4 的数据采集与分析！"
+
+#### Step D — Finalize Section 1
+While Sections 2–4 run, ensure your background web search for Section 1 is complete. Write the structured intelligence to `projects/<game_slug>/section_1_data.json`.
+- The JSON MUST include a `facts` array for hard facts (with source tracking).
+- The JSON MUST include a `findings` string structured exactly like the **Module B: 游戏具体分析框架** (including 基础信息, 多维度评估产品, 核心乐趣与品类定位, 品类基准比较, 品类趋势).
+- **Do not send unverified claims**. If info is missing, write "根据目前公开信息，暂无相关报道" in the `findings`.
+
+Once all sections complete, run `scripts/assemble_report.py` then perform Agent-level synthesis rewrite of the executive summary and final report.
 
 ## Multi-Agent Structure
 
