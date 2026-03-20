@@ -399,12 +399,24 @@ def should_auto_synthesize(args: argparse.Namespace, sections: list[int], result
     return True
 
 
+def reports_dir(project_dir: Path) -> Path:
+    """Mirror of assemble_report.default_output_dir — <skill_root>/reports/<project_name>/"""
+    return project_dir.parent.parent / "reports" / project_dir.name
+
+
 def run_synthesis(project_dir: Path, dry_run: bool) -> bool:
-    command = [sys.executable, str(build_script_path("assemble_report.py")), str(project_dir)]
+    output_dir = reports_dir(project_dir)
+    command = [
+        sys.executable,
+        str(build_script_path("assemble_report.py")),
+        str(project_dir),
+        "--output-dir",
+        str(output_dir),
+    ]
     if dry_run:
         print(f"[DRY RUN] {' '.join(command)}")
         return True
-    print("\n[Run] Synthesis")
+    print(f"\n[Run] Synthesis → {output_dir}")
     return subprocess.run(command, check=False).returncode == 0
 
 

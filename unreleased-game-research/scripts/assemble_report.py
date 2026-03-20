@@ -156,9 +156,20 @@ def write_executive_summary(output_path: Path, project_name: str, summaries: lis
         lines.append("")
     lines.append("")
     lines.append("---")
-    lines.append("> **[AGENT_ACTION_REQUIRED]**")
-    lines.append("> 上述是由脚本提取的拼接内容。作为 Agent，你必须阅读本文档及各 Section 的原始 findings，重新撰写真正具有分析深度的《总体判断》与《维度级总结》，消除机械拼接感，并突出 Section 之间的共识与矛盾。")
-    
+    lines.append("## ⚠️ 【Agent 必须完成以下步骤，否则本报告视为未完成】")
+    lines.append("")
+    lines.append("上方「总体判断」与「维度级总结」是脚本自动生成的数据拼接，**不是最终分析内容**。")
+    lines.append("")
+    lines.append("作为 Agent，你现在必须：")
+    lines.append("1. 读取本文件底部「Section 1~4 详析」中各 section 的完整 findings 内容。")
+    lines.append("2. **删除**上方「总体判断」与「维度级总结」两节的所有脚本生成内容。")
+    lines.append("3. **重新撰写**这两节，要求：")
+    lines.append("   - 用专业分析师口吻，全部使用中文。")
+    lines.append("   - 每个维度下，明确列出正面共识、负面共识、以及各 Section 间的矛盾或分歧点。")
+    lines.append("   - 点名具体证据来源（如「Section 3 多位玩家提到…」「Section 4 创作者指出…」）。")
+    lines.append("   - 字数不设上限，深度优先于简洁。")
+    lines.append("4. 完成重写后，**删除本「⚠️ Agent 必须完成」提示块**，输出干净的最终版本。")
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text("\n".join(lines), encoding="utf-8")
     print(f"[Synthesis] Written: {output_path}")
@@ -178,6 +189,20 @@ def write_final_report(output_path: Path, project_name: str, summaries: list[Sec
     lines.append(f"研究日期：{datetime.now().strftime('%Y-%m-%d')}")
     lines.append(f"整体置信度：{confidence}")
     lines.append("")
+    lines.append("---")
+    lines.append("## ⚠️ 【Agent 必须完成以下步骤，否则本报告视为未完成】")
+    lines.append("")
+    lines.append("上方「一、总结性判断」是脚本自动生成的数据拼接，**不是最终分析内容**。")
+    lines.append("")
+    lines.append("作为 Agent，你现在必须：")
+    lines.append("1. 读取本文件「二~五」各 Section 详析中的完整 findings 内容。")
+    lines.append("2. **删除**上方「一、总结性判断」中所有脚本生成的 bullet point 内容。")
+    lines.append("3. **重新撰写**「一、总结性判断」，要求：")
+    lines.append("   - 全部使用中文，用专业分析师口吻。")
+    lines.append("   - 按「题材与定位 / 美术与视听 / 交互体验与战斗 / 核心玩法与内容循环 / 商业化与成长压力 / 技术表现与优化」六大维度逐一输出。")
+    lines.append("   - 每个维度下列：正面共识、负面共识、Section 间的矛盾分歧（如「Section 2 评论区总体乐观，但 Section 3 内测玩家反馈截然不同」）。")
+    lines.append("   - 具体引用证据来源（如「Section 4 创作者普遍指出……」）。")
+    lines.append("4. 完成重写后，**删除本「⚠️ Agent 必须完成」提示块**，输出干净的最终版本。")
     lines.append("---")
     lines.append("")
     lines.append("## 一、总结性判断")
@@ -229,6 +254,13 @@ def write_final_report(output_path: Path, project_name: str, summaries: list[Sec
     print(f"[Synthesis] Written: {output_path}")
 
 
+def default_output_dir(project_dir: Path) -> Path:
+    """Return <skill_root>/reports/<project_name>/ so the final reports sit
+    parallel to 'projects/' and 'credentials/' for easy access."""
+    skill_root = Path(__file__).resolve().parent.parent
+    return skill_root / "reports" / project_dir.name
+
+
 def main() -> None:
     args = parse_args()
     project_dir = Path(args.project_dir).resolve()
@@ -242,7 +274,7 @@ def main() -> None:
     for summary in summaries:
         print(f"  {'OK' if summary.status == '完成' else 'MISS'} Section {summary.section_id}: {summary.status}")
     buckets = build_dimension_buckets(summaries, project_dir)
-    output_dir = Path(args.output_dir).resolve() if args.output_dir else project_dir / "synthesis"
+    output_dir = Path(args.output_dir).resolve() if args.output_dir else default_output_dir(project_dir)
     write_executive_summary(output_dir / "executive_summary.md", project_name, summaries, buckets)
     write_final_report(output_dir / "final_report.md", project_name, summaries, buckets)
     if not args.skip_validation:

@@ -5,30 +5,60 @@ from pathlib import Path
 
 
 TOPIC_LABEL_ZH = {
+    # General
     "uncategorized": "其他高频讨论",
+    # Technical
     "technical_quality": "技术表现与优化",
     "technical quality / optimization": "技术表现与优化",
+    "performance / optimization": "技术表现与优化",
+    "optimization": "技术表现与优化",
+    "performance": "技术表现与优化",
+    # Art
     "art_visual_identity": "美术与视觉识别",
     "art and atmosphere": "美术与氛围",
+    "art / atmosphere / identity": "美术与视觉氛围",
+    "art / atmosphere": "美术与视觉氛围",
+    "visual identity": "美术与视觉识别",
+    # Gameplay
     "gameplay_loop": "核心玩法循环",
     "gameplay loop": "核心玩法循环",
+    "core loop": "核心玩法循环",
+    # Combat
     "combat and feel": "交互体验与战斗手感",
     "combat depth and feel": "交互体验与战斗手感",
+    "combat / feel": "交互体验与战斗手感",
+    # Progression & Retention
     "progression and retention": "养成与长期留存",
+    "collection and progression": "养成与收集系统",
+    "pacing and retention": "节奏感与留存设计",
+    # Exploration & World
     "exploration and world density": "探索与世界密度",
+    "exploration and world interaction": "探索与世界密度",
+    "world_setting": "世界观与设定",
+    "world setting": "世界观与设定",
+    # Content depth
     "content depth / endgame concern": "内容深度与后期空间",
+    "content ceiling / longevity": "内容天花板与长线运营",
+    # Differentiation & Competition
     "differentiation vs competitors": "差异化与竞品对比",
+    "genre competitiveness": "品类竞争力",
+    "innovation_sameness": "创新度与同质化",
+    "innovation vs sameness": "创新度与同质化",
+    # UX
     "onboarding / UX": "新手引导与界面体验",
+    # Monetization
     "monetization concern": "商业化与付费焦虑",
     "monetization_anxiety": "商业化与付费焦虑",
     "monetization anxiety": "商业化与付费焦虑",
-    "innovation_sameness": "创新度与同质化",
-    "innovation vs sameness": "创新度与同质化",
+    # Theme
     "theme_plot": "题材与叙事表达",
     "theme / plot": "题材与叙事表达",
+    "theme": "题材与叙事表达",
     "ip adaptation": "IP还原与改编",
-    "content ceiling / longevity": "内容天花板与长线运营",
-    "exploration and world interaction": "探索与世界密度",
+    # Trust
+    "trust_in_progress": "开发信任度与进展感",
+    "trust in progress": "开发信任度与进展感",
+    "developer trust": "开发信任度与进展感",
 }
 
 DIMENSION_LABELS = {
@@ -57,7 +87,20 @@ CONFIDENCE_LABEL_ZH = {
 
 
 def topic_to_zh(topic_label: str) -> str:
-    return TOPIC_LABEL_ZH.get(topic_label.strip(), topic_label.strip() or "未分类")
+    key = topic_label.strip()
+    # Exact match first
+    if key in TOPIC_LABEL_ZH:
+        return TOPIC_LABEL_ZH[key]
+    # Case-insensitive fallback
+    key_lower = key.lower()
+    for en_key, zh_val in TOPIC_LABEL_ZH.items():
+        if en_key.lower() == key_lower:
+            return zh_val
+    # If the label contains any non-ASCII characters it is already Chinese — return as-is
+    if any(ord(c) > 127 for c in key):
+        return key
+    # Purely English label with no mapping →归入"其他讨论"so report stays Chinese
+    return "其他讨论" if key else "未分类"
 
 
 def sentiment_to_zh(sentiment_label: str) -> str:

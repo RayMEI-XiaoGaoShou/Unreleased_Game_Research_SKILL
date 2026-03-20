@@ -342,13 +342,32 @@ Once ALL of the following are confirmed:
 
 **Only now**, execute the master runner `scripts/run_research.py` in headless mode using the `--parallel` flag, passing all collected arguments simultaneously. Tell the user: "所有信息已收齐，现在开始并行启动 Section 2、3、4 的数据采集与分析！"
 
-#### Step D — Finalize Section 1
-While Sections 2–4 run, ensure your background web search for Section 1 is complete. Write the structured intelligence to `projects/<game_slug>/section_1_data.json`.
-- The JSON MUST include a `facts` array for hard facts (with source tracking).
-- The JSON MUST include a `findings` string structured exactly like the **Module B: 游戏具体分析框架** (including 基础信息, 多维度评估产品, 核心乐趣与品类定位, 品类基准比较, 品类趋势).
-- **Do not send unverified claims**. If info is missing, write "根据目前公开信息，暂无相关报道" in the `findings`.
+#### Step D — Execute Section 1 (Concurrent with Sections 2–4)
+While Sections 2–4 run in parallel, you must ALSO complete Section 1 by following these two explicit sub-steps:
 
-Once all sections complete, run `scripts/assemble_report.py` then perform Agent-level synthesis rewrite of the executive summary and final report.
+**Sub-step D1 — Write section_1_data.json:**
+Complete your background web research, then write the result to `projects/<game_slug>/section_1_data.json`. The JSON MUST contain:
+- A `facts` array for hard facts (with `fact_key`, `fact_value`, `source_id`, `verification_status`).
+- A `findings` string in pure Chinese, structured as: 范围与核心结论 / 基础信息与开发脉络 / 多维度评估产品 / 核心乐趣提炼与品类定位 / 品类基准比较 / 品类趋势与生态位判断 / 置信度与信息局限.
+- If info is missing for any section, write "根据目前公开信息，暂无相关报道". Do not invent facts.
+
+**Sub-step D2 — Run the Section 1 script:**
+After writing the JSON, run this command explicitly:
+```bash
+python scripts/run_section_1.py --project-dir ./projects/<game_slug> --data-file ./projects/<game_slug>/section_1_data.json
+```
+⛔ Section 1 will be silently skipped in the final report if you forget this step. This is the most common failure point.
+
+#### Step E — Agent Synthesis Rewrite (MANDATORY FINAL STEP)
+After ALL sections (1–4) complete, run `scripts/assemble_report.py` to generate the scaffolding. The reports will be written to `reports/<game_slug>/` (parallel to `projects/` and `credentials/`).
+
+⛔ **The script output is NOT the final report.** You MUST then:
+1. Open `reports/<game_slug>/final_report.md` and `reports/<game_slug>/executive_summary.md`.
+2. Read the full findings from all four sections at the bottom of each file.
+3. **Rewrite** the "总体判断" / "维度级总结" sections in pure Chinese using your own deep reasoning — per dimension, with cross-section comparisons, contradictions, and evidence citations.
+4. Delete the `⚠️ Agent 必须完成` warning block once rewriting is done.
+
+The final deliverables live at: `reports/<game_slug>/executive_summary.md` and `reports/<game_slug>/final_report.md`.
 
 ## Multi-Agent Structure
 
