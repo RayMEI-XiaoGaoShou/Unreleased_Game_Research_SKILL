@@ -1,0 +1,16 @@
+# Ignore python cache
+__pycache__/
+*.pyc
+
+# Ignore environment tokens
+.volcengine_token
+credentials/
+
+# Ignore test projects and output
+projects/
+demo_projects/
+validation_projects/
+test_output/
+*.log
+*.tmp
+tmp_*

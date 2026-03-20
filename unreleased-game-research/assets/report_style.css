@@ -1,0 +1,25 @@
+body {
+  font-family: "Noto Serif", serif;
+  line-height: 1.6;
+  color: #1f2933;
+  margin: 2rem auto;
+  max-width: 900px;
+}
+
+h1,
+h2,
+h3 {
+  color: #102a43;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th,
+td {
+  border: 1px solid #d9e2ec;
+  padding: 0.5rem;
+  text-align: left;
+}
