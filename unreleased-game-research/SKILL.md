@@ -616,22 +616,28 @@ The synthesis must include:
 - the full detailed outputs from Section 1 through Section 4 after the summary
 - confidence level and unresolved questions
 
-### Agent-Driven Deep Analysis (Section 3, Section 4 & Synthesis)
+### Agent-Driven Deep Analysis (Section 2, Section 3, Section 4 & Synthesis)
 
-While the Python scripts are responsible for raw data extraction (fetching comments, transcripts, building baseline CSVs), **deep dimensional analysis is the responsibility of the Agent**. 
+While the Python scripts are responsible for raw data extraction (fetching comments, transcripts, building baseline CSVs), **deep dimensional analysis is the responsibility of the Agent across all sections**. 
 
-The fundamental logic of this skill is a funnel of increasing analytical depth:
-- Section 2: Broad audience sentiment (High volume, macro trends)
-- Section 3: Core tester reviews (Medium volume, detailed text)
-- Section 4: Professional creator reviews (Low volume, extreme depth per sample)
+The fundamental logic of this skill is a funnel of increasing analytical depth, but ALL sections require Agent-authored synthesis:
+- Section 2: Broad audience sentiment (High volume, macro trends -> Requires Agent to spot narrative shifts across milestones)
+- Section 3: Core tester reviews (Medium volume, detailed text -> Requires Agent to extract meaning units)
+- Section 4: Professional creator reviews (Low volume, extreme depth per sample -> Requires Agent to map consensus vs disagreement)
 
 When generating the final report or rewriting section findings:
-1. Do not rely solely on the Python script's single-label extraction.
-2. Read the raw text from `review_sample.csv` (for Section 3) and `transcript_segments.csv` / `claim_evidence_map.csv` (for Section 4), as well as the detailed AI findings from Section 1.
+1. Do not rely solely on the Python script's single-label extraction or auto-generated tables.
+2. Read the raw text from `comment_sample.csv` and `topic_summary.csv` (for Section 2), `review_sample.csv` (for Section 3), and `transcript_segments.csv` / `claim_evidence_map.csv` (for Section 4), as well as the detailed AI findings from Section 1.
 3. Use your own built-in LLM capabilities to perform a multi-dimensional breakdown. For example, if a TapTap long review covers both `美术` and `战斗`, explicitly split and analyze those points into the respective dimension buckets in the final output.
 4. Structure the output clearly with positive and negative points per dimension, supported by exact quotes from the raw data.
 5. Treat the Python outputs as **contracts and evidence tables**, not as the final narrative standard.
 6. The final polished report text should be Agent-authored, evidence-backed, and significantly more structured than the raw script summaries.
+
+**Specific Requirement for Section 2 Findings:**
+The `scripts/generate_section_2_findings.py` outputs a purely quantitative baseline. The Agent MUST NOT stop there. The Agent must upgrade the `findings.md` by applying deep reasoning based on the reference paradigm (`references/section_2_official_video_comments.md` which is modeled after the Baiyin Zhicheng PDF report):
+1. **Milestone-to-Milestone Change (核心关注点):** The Agent must deeply analyze *why* sentiment or topics shifted between milestones. Do not just state numbers; connect the shift to what was actually shown in the video (e.g., "From PV1 to Demo, negative sentiment on combat mechanics rose. This is likely due to the lack of hit-stop in the new footage").
+2. **Topic-Level Sentiment (话题情绪分布):** Go beyond the CSV script counts. For the top 2-3 most discussed topics, the Agent must write a qualitative synthesis summarizing *what* exactly the audience is praising or criticizing, backed by 2-3 direct quotes from `comment_sample.csv` (using `comment_id`).
+3. **Representative Views (典型观点拆解):** Just like Section 3, explicitly split positive views and negative concerns into logical bullets, and quote the exact comments that best capture the crowd's sentiment. Avoid generic summaries.
 
 **Specific Requirement for Synthesis (Executive Summary & Final Report):**
 The `scripts/assemble_report.py` will generate a basic scaffolding for the synthesis files. However, the Agent **MUST NOT** just leave the script-generated files as the final output.
