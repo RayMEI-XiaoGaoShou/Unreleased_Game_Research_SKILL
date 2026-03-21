@@ -129,6 +129,137 @@ For hard facts, each row must contain:
 
 Accepted `verification_status` values for hard facts:
 
+---
+name: unreleased-game-research
+description: Research unreleased games through public information, official video comment analysis, homepage player review analysis, and creator review video interpretation. Use when a coding agent needs to investigate pre-launch games, map development milestones, compare player sentiment across test phases, assess creator feedback reliability, and assemble a structured evidence-based report with markdown artifacts and optional PDF export.
+---
+
+# Unreleased Game Research
+
+Build an evidence-based research package for an unreleased game.
+Treat this skill as an orchestration layer, not as a single giant prompt.
+Prefer stable artifacts over inline reasoning.
+
+## Core Mission
+
+Produce a structured dossier that helps a strategy analyst answer:
+
+- what this game actually is
+- who is making it and what that implies
+- how it changed over milestones
+- how official audience reaction evolved
+- what likely test players are saying
+- what credible creators think about the latest playable build
+- what remains uncertain
+
+## Operating Principles
+
+- Separate facts, opinions, and inference.
+- Preserve evidence provenance.
+- Prefer partial but auditable output over polished but weakly grounded claims.
+- Keep markdown artifacts as the primary deliverable.
+- Treat PDF as a packaging layer, not the source of truth.
+
+## Default Workflow
+
+1. Initialize a project folder and artifact contract.
+2. Build the source registry and milestone map.
+3. Run Section 1 first to establish product framing.
+4. Run Sections 2-4 when inputs are ready.
+5. Normalize text, sentiment, topic labels, and evidence references.
+6. Synthesize across sections without flattening disagreement.
+7. Export a final markdown report and optional PDF.
+
+Read `references/research_workflow.md` before running a full end-to-end study.
+
+## Project Initialization
+
+Create a project under `projects/<game_slug>/`.
+
+Minimum required files and folders:
+
+- `project.yaml`
+- `sources/source_registry.csv`
+- `sources/source_notes.md`
+- `section_1_public_intel/`
+- `section_2_official_video_comments/`
+- `section_3_homepage_reviews/`
+- `section_4_creator_reviews/`
+- `synthesis/`
+- `exports/`
+
+If a required section cannot run, create the folder anyway and record the reason in `findings.md`.
+
+Use `scripts/init_project.py` to create this structure.
+
+## Required References
+
+Read these references before running the corresponding section:
+
+- `references/report_schema.md`
+- `references/source_reliability.md`
+- `references/bias_control.md`
+- `references/section_1_public_intel.md`
+- `references/section_2_official_video_comments.md`
+- `references/section_3_homepage_reviews.md`
+- `references/section_4_creator_reviews.md`
+- `references/credentials_guide.md`
+
+Use `references/visualization_guidelines.md` when generating charts or report visuals.
+
+## Operating Modes
+
+### `safe_mode`
+
+Use when compliance risk, scraping fragility, or environment limits are high.
+
+Behavior:
+
+- prioritize public and official sources
+- prefer YouTube API if available
+- allow manual URL input or manual source dumps
+- stop at markdown if PDF or capture automation is unstable
+
+### `deep_mode`
+
+Use when the environment supports richer automation and the operator accepts higher fragility.
+
+Behavior:
+
+- enable best-effort page capture for supported platforms
+- allow transcription and richer visual outputs
+- still preserve the same artifact contract
+- never hide capture failures or partial coverage
+
+## Section Order
+
+### Section 1
+
+Run first unless the user explicitly wants only one later section.
+This section defines the game's frame and milestone map.
+
+**Agent Action Required:**
+The AI Agent must execute **Global Intelligence Gathering** by heavily utilizing web search, explore/librarian agents, and public databases to gather exhaustive facts about the game, the developer, and its test history.
+
+Section 1 now has a **fact-gate**. The AI Agent must not write freeform company facts directly into final findings without source verification. Before calling `scripts/run_section_1.py`, prepare a structured `facts` array inside `section_1_data.json`.
+
+Required hard-fact keys:
+
+- `official_name`
+- `developer`
+- `publisher`
+
+For hard facts, each row must contain:
+
+- `fact_key`
+- `fact_value`
+- `source_id`
+- `source_type`
+- `verification_status`
+- `confidence_level`
+
+Accepted `verification_status` values for hard facts:
+
 - `official_confirmed`
 - `cross_checked`
 - `verified`
@@ -137,10 +268,12 @@ Accepted `verification_status` values for hard facts:
 
 **Crucial Analysis Framework:**
 The Agent must structure the `findings` inside `section_1_data.json` exactly according to the `references/section_1_public_intel.md` framework:
-1. **多维度评估产品** (玩法、视觉美术、题材、交互设计)
-2. **核心乐趣提炼与品类定位**
-3. **品类基准比较** (继承、强化、创造、解决)
-4. **品类趋势与生态位判断**
+1. **多维度评估产品** — for each of the four sub-dimensions (玩法、视觉美术、题材、交互设计), write at least 2–3 sentences covering both strengths and potential weaknesses based on what is publicly known. Do NOT collapse into a single-line summary.
+2. **核心乐趣提炼与品类定位** — identify the primary emotional hook and compare to 1–2 concrete comparable games.
+3. **品类基准比较** (继承、强化、创造、解决) — fill in all four fields rather than leaving any blank.
+4. **品类趋势与生态位判断** — conclude with an explicit ecosystem position statement: who this product is competing with, and what gap it is attempting to fill.
+
+**Depth Requirement:** Section 1 findings must be written at a level of granularity where a product manager unfamiliar with the game could understand the product's positioning and its key design risks from the text alone — not just its genre label.
 
 **Zero Hallucination Rule:** If the web search does not provide enough info for a specific dimension (e.g., interaction design), explicitly write "根据目前公开信息，暂无相关报道" instead of making up features.
 
@@ -193,22 +326,27 @@ The Agent must then do a second-pass deep analysis on top of:
 
 Agent requirements for Section 3 deep analysis:
 
-1. Read the full long-review text, not just the summary row.
-2. Split a single long review into multiple meaning units if it covers multiple topics.
-3. Re-organize findings into generic game-analysis dimensions such as:
-   - `题材与定位`
-   - `美术与视听`
-   - `交互体验与战斗`
-   - `核心玩法与内容循环`
-   - `商业化与成长压力`
-   - `技术表现与优化`
+1. Read the **full long-review text**, not just the summary row. Do NOT skip reviews that are short — even brief ones may contain unique signal about a specific system.
+2. **Split a single long review into multiple meaning units.** A meaning unit is one claim about one specific game element (e.g., "锁敌乱锁" and "镜头过低" are two separate meaning units even if they appear in the same sentence). Each meaning unit must be:
+   - Assigned to one game-analysis dimension.
+   - Paired with an exact quote from the source review (use `review_id` for traceability).
+   - Classified as positive, negative, or mixed.
+3. Re-organize ALL meaning units into these dimensions:
+   - `题材与定位` (including target audience boundary and genre identity)
+   - `美术与视听` (including character model, scene quality, audio, UI aesthetics — all treated as separate sub-dimensions)
+   - `交互体验与战斗` (including hit-feel, parry/dodge rules, camera/lock-on, skill readability)
+   - `核心玩法与内容循环` (including post-main-story retention hooks, side-system depth)
+   - `商业化与成长压力` (including gacha mechanics, resource pacing, progression grind)
+   - `技术表现与优化` (including frame rate by scene type, loading, platform-specific issues)
    - `市场讨论与竞品比较`
-4. For each dimension, summarize:
-   - positive points
-   - negative points / concerns
-   - representative quotes from the raw long reviews
-5. Preserve disagreement when different long reviews point in different directions.
-6. Do not simply dump raw quote excerpts as the final narrative. The final `findings.md` should be a structured analyst summary backed by quotes.
+4. **For each dimension, the findings must include all three layers:**
+   - **a) Structural summary**: 2–4 sentences synthesizing the overall picture.
+   - **b) Positive points**: bullet list, each with at least one quoted source.
+   - **c) Negative points / concerns**: bullet list, each with at least one quoted source.
+   - If a sub-dimension (e.g., "character model" within Art) has distinct positive AND negative signals, treat it as its own subsection (### level heading).
+5. **Mandatory contradiction preservation**: When reviews disagree on the same dimension (e.g., some players love the combat pacing, others find it unresponsive), explicitly call out the disagreement in a "**分歧点**" paragraph — do not average it out or suppress the minority view.
+6. **Minimum quote density**: Each dimension section must include at least 2–3 direct evidence quotes (format: `"原文引用"`（`review_id`）). Using more is encouraged.
+7. Section 3 `findings.md` should ultimately read like a memo commissioned by a game design lead, not just a sentiment dashboard. It should be possible to derive concrete product iteration recommendations directly from the text.
 
 ### Section 4
 
@@ -496,21 +634,35 @@ When generating the final report or rewriting section findings:
 6. The final polished report text should be Agent-authored, evidence-backed, and significantly more structured than the raw script summaries.
 
 **Specific Requirement for Synthesis (Executive Summary & Final Report):**
-The `scripts/assemble_report.py` will generate a basic scaffolding for the synthesis files. However, the Agent **MUST NOT** just leave the script-generated files as the final output. 
+The `scripts/assemble_report.py` will generate a basic scaffolding for the synthesis files. However, the Agent **MUST NOT** just leave the script-generated files as the final output.
 The Agent must:
-1. Read the script-generated scaffolding in `synthesis/executive_summary.md` and `synthesis/final_report.md`.
-2. Rewrite the "总体判断" (Overall Judgment) and "维度级总结" (Dimensional Summary) using its own deep understanding of the 4 sections.
-3. Ensure the Executive Summary reads like a cohesive analyst memo, not a mechanical list of bullet points. Identify where Section 1's intended gameplay loop conflicts with Section 3's player feedback, or where Section 4's creator reviews highlight deep systemic issues.
-4. Keep the structure defined by the script, but entirely replace the generated content under each section heading with the Agent's own high-quality synthesized analysis.
+1. Read the script-generated scaffolding AND the full findings from all four section `findings.md` files before writing a single word of synthesis.
+2. Rewrite the "一、总结性判断" section using the following mandatory per-dimension structure:
+   - **正面共识** (cross-source positives with section attribution)
+   - **负面共识** (cross-source negatives with section attribution)
+   - **跨源矛盾分歧** — explicitly call out cases where Section 2 (broad audience) is optimistic but Section 3 (core testers) is cautious, or where Section 4 creators disagree with each other.
+3. **Minimum synthesis density:** Each of the six standard dimensions (题材与定位 / 美术与视听 / 交互体验与战斗 / 核心玩法与内容循环 / 商业化与成长压力 / 技术表现与优化) must have at least 3–4 sentences of synthesized commentary — never just a single bullet per dimension.
+4. The executive summary's **opening paragraph** must deliver a decisive overall verdict in 3–5 sentences, followed by the dimension breakdown. It should be written so that a strategy analyst can form a go/no-go opinion in under 60 seconds without reading anything else.
+5. **Do NOT compress disagreements into a single averaged conclusion.** Where evidence pulls in conflicting directions, surface both poles explicitly.
 
 **Specific Requirement for Section 4 Findings:**
 Because Section 4 deals with a small number of professional/deep reviews, the Agent MUST output the following exact structure:
-1. **多维度综合共识 (Multi-dimensional Synthesis):** Similar to Section 3, summarize the collective creator viewpoints grouped by universal game dimensions (e.g., 美术与视听, 交互体验与战斗, 商业化). Under each dimension, list the synthesized positive points and negative/concern points.
-2. **逐视频深度诊断 (Per-Video Deep Dive):** For each selected creator video, provide a dedicated summary that includes:
-   - Creator's overall stance/conclusion
-   - Positive points identified by this specific creator
-   - Negative points / concerns raised by this creator
-   - **MUST include direct quotes** from the creator's transcript to back up these points.
+
+1. **多维度综合共识 (Multi-dimensional Synthesis):** Summarize collective creator viewpoints by universal game dimensions (same list as Section 3). For each dimension:
+   - Write a structural summary paragraph (2–4 lines).
+   - List positive points with quoted evidence (format: `"creator quote"`（`video_id`）).
+   - List negative/concern points with quoted evidence.
+   - If creators **disagree** on a dimension, add a "**观点分歧 (Disagreement)**" subsection — identify which creator holds which position and quote both. **Disagreement is signal, not noise.**
+
+2. **逐视频深度诊断 (Per-Video Deep Dive):** For each selected creator video, provide a dedicated summary block that must include:
+   - Creator channel type and analytical stance (e.g., "硬核设计分析派", "泛娱乐综合博主")
+   - Core praise (with exact quote)
+   - Core concerns (with exact quote)
+   - The one strongest analytic insight unique to this creator that other creators did not surface
+
+3. **创作者共识 vs 分歧地图 (Consensus vs Disagreement Map):** Mandatory table with columns: Dimension | Consensus Direction | Is there disagreement? For dimensions with disagreement, name the disagreeing parties. Reference the City of Silver example report for the exact table format.
+
+4. **置信度与分析局限 (Confidence & Limitations):** 3–5 bullet points honestly noting what the creators could NOT see (e.g., tested on a closed beta build, single platform, limited play hours), which conclusions may not generalize, and what questions remain open.
 
 This means the architecture is intentionally balanced:
 
