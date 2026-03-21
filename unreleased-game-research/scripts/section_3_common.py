@@ -338,7 +338,9 @@ def read_csv_rows(path: Path) -> list[dict[str, str]]:
 def write_csv_rows(path: Path, header: list[str], rows: list[dict[str, str]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=header)
+        # extrasaction='ignore' prevents crashes when rows carry extra keys
+        # (e.g. from parallel writes by another section script or a schema drift).
+        writer = csv.DictWriter(handle, fieldnames=header, extrasaction="ignore")
         writer.writeheader()
         writer.writerows(rows)
 

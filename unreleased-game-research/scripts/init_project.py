@@ -13,7 +13,9 @@ SECTION_DIRS = [
 
 
 SECTION_2_HEADERS = {
-    "video_registry.csv": "video_id,milestone_id,platform,url,title,publish_date,channel_name,official_status,content_type,comment_capture_mode,comments_captured,language_mix,notes\n",
+    # Must stay in sync with VIDEO_REGISTRY_HEADER in collect_bilibili_comments.py
+    # and collect_youtube_comments.py (16 columns).
+    "video_registry.csv": "video_id,milestone_id,platform,url,title,publish_date,channel_name,official_status,content_type,comment_capture_mode,comments_captured,comments_visible_total,coverage_ratio,capture_stop_reason,language_mix,notes\n",
     "comment_sample.csv": "comment_id,video_id,platform,comment_time,author_name,text_original,text_normalized,language,likes,replies,is_top_comment,is_spam_or_noise,sentiment_label,topic_label,confidence_note\n",
     "sentiment_summary.csv": "video_id,milestone_id,positive_count,neutral_count,negative_count,positive_ratio,neutral_ratio,negative_ratio,positive_like_weight,negative_like_weight,notes\n",
     "topic_summary.csv": "video_id,milestone_id,topic_label,mention_count,mention_ratio,positive_ratio_within_topic,negative_ratio_within_topic,avg_likes,representative_evidence_id\n",

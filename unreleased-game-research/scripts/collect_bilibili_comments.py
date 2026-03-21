@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import random
 import re
@@ -13,6 +14,73 @@ from urllib import error, parse, request
 import importlib
 
 exclusive_file_lock = importlib.import_module("file_lock").exclusive_file_lock
+
+# ---------------------------------------------------------------------------
+# Bilibili WBI Signature
+# Required since 2023 for all /x/* API endpoints.
+# Without this, the server returns HTTP 412.
+# Pure stdlib implementation – no external dependencies.
+# Reference: https://github.com/SocialSisterYi/bilibili-API-collect
+# ---------------------------------------------------------------------------
+
+_MIXIN_KEY_ENC_TAB = [
+    46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35,
+    27, 43, 5, 49, 33, 9, 42, 19, 29, 28, 14, 39, 12, 38, 41, 13,
+    37, 48, 7, 16, 24, 55, 40, 61, 26, 17, 0, 1, 60, 51, 30, 4,
+    22, 25, 54, 21, 56, 59, 6, 63, 57, 62, 11, 36, 20, 34, 44, 52,
+]
+
+_wbi_cache: dict[str, Any] = {}  # {"mixin_key": str, "expires_at": float}
+
+
+def _fetch_wbi_keys(cookie_string: str) -> tuple[str, str]:
+    """Fetch img_key and sub_key from Bilibili /x/web-interface/nav."""
+    url = "https://api.bilibili.com/x/web-interface/nav"
+    req = request.Request(url)
+    req.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+    req.add_header("Referer", "https://www.bilibili.com/")
+    if cookie_string:
+        req.add_header("Cookie", cookie_string)
+    try:
+        with request.urlopen(req, timeout=15) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+    except Exception as exc:
+        raise SystemExit(f"Failed to fetch WBI keys: {exc}") from exc
+    wbi_img = data.get("data", {}).get("wbi_img", {})
+    img_url: str = wbi_img.get("img_url", "")
+    sub_url: str = wbi_img.get("sub_url", "")
+    img_key = img_url.rsplit("/", 1)[-1].split(".")[0]
+    sub_key = sub_url.rsplit("/", 1)[-1].split(".")[0]
+    return img_key, sub_key
+
+
+def _derive_mixin_key(img_key: str, sub_key: str) -> str:
+    raw = img_key + sub_key
+    return "".join(raw[i] for i in _MIXIN_KEY_ENC_TAB if i < len(raw))[:32]
+
+
+def _get_mixin_key(cookie_string: str) -> str:
+    now = time.time()
+    if _wbi_cache.get("mixin_key") and now < _wbi_cache.get("expires_at", 0):
+        return _wbi_cache["mixin_key"]
+    img_key, sub_key = _fetch_wbi_keys(cookie_string)
+    mixin_key = _derive_mixin_key(img_key, sub_key)
+    _wbi_cache["mixin_key"] = mixin_key
+    _wbi_cache["expires_at"] = now + 3600  # cache for 1 hour
+    return mixin_key
+
+
+def _wbi_sign_params(params: dict[str, Any], cookie_string: str) -> dict[str, Any]:
+    """Return a copy of params with wts and w_rid added (WBI signature)."""
+    mixin_key = _get_mixin_key(cookie_string)
+    signed = dict(params)
+    signed["wts"] = int(time.time())
+    # Remove chars that may interfere with signing
+    def _clean(v: str) -> str:
+        return re.sub(r"[!'()*]", "", str(v))
+    query = "&".join(f"{k}={_clean(v)}" for k, v in sorted(signed.items()))
+    signed["w_rid"] = hashlib.md5((query + mixin_key).encode("utf-8")).hexdigest()
+    return signed
 
 
 VIDEO_REGISTRY_HEADER = [
@@ -155,8 +223,6 @@ def fetch_video_metadata(bvid: str, cookie_string: str) -> dict[str, Any]:
 def fetch_main_comments(oid: int, sort_mode: str, max_pages: int, cookie_string: str) -> tuple[list[dict[str, Any]], int, str]:
     # sort_mode: 1=time, 2=hot (fallback to 0=time default usually)
     sort_param = 2 if sort_mode == "hot" else 1
-    # Bilibili uses pagination (next parameter in newer APIs, but pn for older ones)
-    # Using the standard v2/reply endpoint with pn
     all_replies: list[dict[str, Any]] = []
     total_count = 0
     stop_reason = "complete"
@@ -166,8 +232,10 @@ def fetch_main_comments(oid: int, sort_mode: str, max_pages: int, cookie_string:
         if max_pages > 0 and page > max_pages:
             stop_reason = "page_limit"
             break
-        url = f"https://api.bilibili.com/x/v2/reply?type=1&oid={oid}&sort={sort_param}&pn={page}&ps=20"
-        time.sleep(random.uniform(0.2, 0.6))
+        base_params = {"type": "1", "oid": str(oid), "sort": str(sort_param), "pn": str(page), "ps": "20"}
+        signed = _wbi_sign_params(base_params, cookie_string)
+        url = "https://api.bilibili.com/x/v2/reply?" + parse.urlencode(signed)
+        time.sleep(random.uniform(0.8, 1.5))  # slightly longer delay after WBI
         data = bilibili_request(url, cookie_string)
         
         if data.get("code") != 0:
@@ -198,8 +266,10 @@ def fetch_sub_replies(oid: int, root_id: int, max_replies: int, cookie_string: s
     page = 1
     
     while len(all_replies) < max_replies:
-        url = f"https://api.bilibili.com/x/v2/reply/reply?type=1&oid={oid}&root={root_id}&pn={page}&ps=20"
-        time.sleep(random.uniform(1.0, 2.5))  # Anti-bot jitter
+        base_params = {"type": "1", "oid": str(oid), "root": str(root_id), "pn": str(page), "ps": "20"}
+        signed = _wbi_sign_params(base_params, cookie_string)
+        url = "https://api.bilibili.com/x/v2/reply/reply?" + parse.urlencode(signed)
+        time.sleep(random.uniform(1.5, 3.0))  # longer delay for sub-replies
         data = bilibili_request(url, cookie_string)
         
         if data.get("code") != 0:
