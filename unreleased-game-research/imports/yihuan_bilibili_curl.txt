@@ -1,0 +1,15 @@
+curl 'https://line1-h5-pc-api.biligame.com/game/comment/recommend?game_base_id=111795&hit_mark_hot_exp=true&ts=1774075147291&request_id=ef23Av81GvVAvxXoA4zkEgu3JfrBkxC5&appkey=h9Ejat5tFh81cq8V&sign=e9fa456eeeecd1be544334c3adb15772' \
+  -H 'accept: */*' \
+  -H 'accept-language: zh-CN,zh;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6' \
+  -b 'b_nut=1767871145; buvid3=9E3AEF2C-F72E-499E-FD19-CE75CB6626F745411infoc; buvid_fp=f1b7932047f758af6fd8c7acf5156e57; buvid4=19BE3626-5FD3-33C4-94A7-6A55022223C861310-026010819-bnv8HZzAvzmLXzOYT6RhIg%3D%3D; SESSDATA=deec80ad%2C1789626284%2Ca9cd5%2A32CjApIYKLByz_-m3UkM7Bs5El-tz9l1-vB8qPFJwMjD5HxWwYYTL_FB-5Hu2LMmSHZQsSVm1hWEFhZ0g0VWY5bHdQUlpmdlJ0MnRfTlhRb2tmcEdJdEEwX3ZaRkNTbUpYTXdKQWZNR0xINnJFNDNjeGlSVkR2RU1EYm1HLXI5S0kwM05sVmRRSW5RIIEC; bili_jct=c8c8231cae417f394d38578f945b4710; DedeUserID=633946180; DedeUserID__ckMd5=6493cbef092c6648; sid=p3xfyjoe; Hm_lvt_e61bc5e4df128a1dc4db0bb30558ebe4=1774074680; HMACCOUNT=78EE3CCD0A9D1B61; Hm_lpvt_e61bc5e4df128a1dc4db0bb30558ebe4=1774075147; b_lsid=DFEA6562_19D0F1E73D2' \
+  -H 'dnt: 1' \
+  -H 'origin: https://www.biligame.com' \
+  -H 'priority: u=1, i' \
+  -H 'referer: https://www.biligame.com/' \
+  -H 'sec-ch-ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Windows"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-site' \
+  -H 'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36'
