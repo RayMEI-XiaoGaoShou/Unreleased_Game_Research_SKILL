@@ -505,6 +505,11 @@ After ALL sections (1–4) complete, run `scripts/assemble_report.py` to generat
 3. **Rewrite** the "总体判断" / "维度级总结" sections in pure Chinese using your own deep reasoning — per dimension, with cross-section comparisons, contradictions, and evidence citations.
 4. Delete the `⚠️ Agent 必须完成` warning block once rewriting is done.
 
+#### Step F — Final Polish and Delivery (绝对必须执行的最后一步)
+Before delivering the final files to the user:
+1. Double-check that all placeholder/scaffolding texts and warning blocks (specifically any `⚠️ 【Agent 必须完成以下步骤，否则本报告视为未完成】` contexts) have been completely removed from both `final_report.md` and `executive_summary.md`.
+2. The final reports must purely resemble a polished, client-ready research dossier with zero meta-instructions leaking through.
+
 The final deliverables live at: `reports/<game_slug>/executive_summary.md` and `reports/<game_slug>/final_report.md`.
 
 ## Multi-Agent Structure
@@ -634,10 +639,26 @@ When generating the final report or rewriting section findings:
 6. The final polished report text should be Agent-authored, evidence-backed, and significantly more structured than the raw script summaries.
 
 **Specific Requirement for Section 2 Findings:**
-The `scripts/generate_section_2_findings.py` outputs a purely quantitative baseline. The Agent MUST NOT stop there. The Agent must upgrade the `findings.md` by applying deep reasoning based on the reference paradigm (`references/section_2_official_video_comments.md` which is modeled after the Baiyin Zhicheng PDF report):
-1. **Milestone-to-Milestone Change (核心关注点):** The Agent must deeply analyze *why* sentiment or topics shifted between milestones. Do not just state numbers; connect the shift to what was actually shown in the video (e.g., "From PV1 to Demo, negative sentiment on combat mechanics rose. This is likely due to the lack of hit-stop in the new footage").
-2. **Topic-Level Sentiment (话题情绪分布):** Go beyond the CSV script counts. For the top 2-3 most discussed topics, the Agent must write a qualitative synthesis summarizing *what* exactly the audience is praising or criticizing, backed by 2-3 direct quotes from `comment_sample.csv` (using `comment_id`).
-3. **Representative Views (典型观点拆解):** Just like Section 3, explicitly split positive views and negative concerns into logical bullets, and quote the exact comments that best capture the crowd's sentiment. Avoid generic summaries.
+The `scripts/generate_section_2_findings.py` outputs a purely quantitative baseline. The Agent MUST NOT stop there. The Agent must upgrade the `findings.md` by applying deep reasoning based on the reference paradigm (`references/section_2_official_video_comments.md` which is modeled after the Baiyin Zhicheng PDF report Part 1/2/3).
+The final `findings.md` for Section 2 MUST strictly follow this Markdown structure:
+
+## 1. 核心结论 (Core Conclusions)
+(Agent-authored: 2-3 bullet points summarizing the most critical cross-platform insights).
+
+## 2. B站视频分析 (if Bilibili data exists)
+### 2.1 总体情绪分布
+(Must render a Markdown table showing Positive/Neutral/Negative counts and ratios based on `sentiment_summary.csv` for Bilibili).
+### 2.2 游戏设计相关讨论焦点的情绪情况
+(Must render a Markdown table showing Top Topics, Mention Ratio, and Sentiment Split based on `topic_summary.csv` for Bilibili).
+### 2.3 典型正面观点
+(Agent-authored analysis: Group positive feedback by game design dimensions. Each bullet must have an analytical insight header followed by representative quotes and IDs, e.g., "题材/世界观/剧情：“英伦/侦探/城市氛围” 在二次元开放世界里形成了差异化，用户愿意为风格买单。 -> Quote (ID)").
+### 2.4 典型负面观点/担忧点
+(Agent-authored analysis: Group negative feedback similarly, with analytical headers and quotes).
+
+## 3. YouTube视频分析 (if YouTube data exists)
+(Strictly mirror the exact same 4 subsections as Bilibili, using YouTube data).
+
+**Crucial Note**: The tables for 2.1 and 2.2 MUST be explicitly drawn in markdown using the CSV data. The qualitative analysis in 2.3 and 2.4 MUST NOT just be raw quotes; the Agent must synthesize the deeper meaning (as an analyst) as the list header, heavily relying on its own reasoning capabilities rather than just grouping by script categories.
 
 **Specific Requirement for Synthesis (Executive Summary & Final Report):**
 The `scripts/assemble_report.py` will generate a basic scaffolding for the synthesis files. However, the Agent **MUST NOT** just leave the script-generated files as the final output.

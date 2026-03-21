@@ -58,53 +58,82 @@
 
 ## 三、Section 2 官方视频评论详析
 
-## Scope
-- Videos analyzed: 2 (`BS281osYsQw` [YouTube], `BV1kRqnBdEQJ` [Bilibili])
-- Milestones covered: Alpha Test (同一律测试)
-- Platforms covered: Bilibili, YouTube
+# Section 2: 官方发布视频评论分析
 
-## Core Conclusions
-- **品牌滤镜下的期许 vs 大环境的拷问**：整体而言，B站受众对《白银之城》展现出了更高的宽容度和“开发信任度”，评论多聚焦于对美术和世界观的肯定。而 YouTube 观众则呈现出显著的“商业化焦虑（Monetization Anxiety）”与“同质化疲劳（Innovation Sameness）”。
-- **包装获赞，玩法受疑**：两大平台在“美术与视觉识别”上达成了正面共识，但在“技术表现与优化”上，尽管官方在展示中穿插了战斗，仍被多端观众指出存在掉帧、运镜乱晃等问题。
+## 1. 核心结论 (Core Conclusions)
+- **跨平台审美认可（极高的第一印象门槛）**：极其罕见地，海内外受众对《白银之城》UE5 构建的维多利亚蒸汽朋克场景、全局光追水面反光以及古典交响配乐给出了高度统一的盛赞。其“非正统科幻/废土”的差异化题材在二游红海中成功突围。
+- **B站特供的“开发信任” vs YouTube 的“同质化疲劳”**：B站玩家展现出了极强的养成耐心与厂牌滤镜（超高提及率的“优化肯定”与“信任度进步”）；而 YouTube 观众则深陷严重的“开放世界疲劳”，大量评论直指其为“又一个强行塞入抽卡系统的打怪模拟器”。
+- **隐爆点（战斗与角色模型的割裂）**：尽管画面绝美，但两端核心向分析均敏锐捕捉到了两个核心毒点——实机战斗演示的动作僵硬/视角眩晕，以及“高级写实场景”与“廉价卡通渲染角色”之间产生的巨大“不在一个图层”的违和感。
 
-## Milestone-to-Milestone Change (平台间跨源舆论差)
-*注：本次分析主要对比了相同里程碑下，B站与YT端的跨平台差异。*
-1. **“开发信任度”在B站形成护城河，在海外缺失**：在 Bilibili 端，”开发信任度“讨论占比高达 4.9%，大量乐元素老玩家表达了支持（`"我是乐元素老玩家了，能给个测试机会吗" - 283807790273`）。而 YouTube 该标签仅占 0.2%，海外玩家缺乏老玩家滤镜护航，审视更加严苛。
-2. **“商业化焦虑”在海外断层领先**：YouTube 评论区“商业化焦虑”占比高达 11.2%（对比B站仅 0.6%）。海外玩家高度关注游戏是否会落入枯燥的二游抽卡泥潭，（`"It looks like a Kingdom Hearts gacha without Disney characters..." - Ugz7it9gNLDnnlkKRFF4AaABAg`）。
+---
 
-## Topic-Level Sentiment (核心话题情绪提炼)
-1. **美术与视觉识别 (Art & Visual Identity)**
-   - 观众普遍对维多利亚/蒸汽朋克题材的视听展现给予了高度好评，认为它在目前市场中具有独特性。
-   - B站代表观点：`"题材画风这块有独特性，类比为啥1999能活下去还比较火" - 285913033936`
-   - 但 YouTube 也有少数受众认为 3D 渲染质感仍偏向“通用二次元”（`"generic anime art style" - UgzN_9JgZjYiaq9MsPx4AaABAg`）。
-2. **核心玩法循环 (Gameplay Loop)**
-   - 关注度极高，但争议极大。大量海外玩家指出演示中步行、待机动画过多，缺乏足够深度的实机游玩干货。
-   - YT抱怨：`">gameplay trailer >ninety percent of it is just menu and idle animations" - UgxVnfLRkVjAqtFZAE14AaABAg`
-   - B站核心玩家则呼吁官方想清楚动作戏和侦探解谜的主次，避免喧宾夺主（`"动作戏可以有，但是侦探推理的过程才是精髓" - 283808354465`）。
+## 2. B站视频分析 (BV1kRqnBdEQJ)
 
-## Representative Positive Views (典型正面观点拆解)
-- **题材独特性与受众人群匹配**
-  - `"一定要好好做啊啊啊我真的很喜欢你们家的题材和画风"`（`285778058160` - B站）
-  - `"现在真的需要更多更有创新的大世界，现在的头部大世界鸣潮和原神真的是换汤不换药..."`（`283910808993` - B站）
-- **对项目初期跑通实机的认可**
-  - `"就一测而言完成度挺高的，场景和角色也很顶[支持][支持]"`（`285817106576` - B站）
+### 2.1 总体情绪分布
+| 情绪维度 | 计数 | 占比 | 获赞权重估计 |
+|---|---|---|---|
+| 正面 (Positive) | 286 | 26.5% | 高 (20k+) |
+| 中性 (Neutral) | 757 | 70.1% | 中 (探讨为主) |
+| 负面 (Negative) | 37 | 3.4% | 低 (零星抱怨) |
 
-## Representative Negative Views / Concerns (典型隐患与担忧)
-- **动作帧率与运镜眩晕感**
-  - `"美术还是很生硬啊，表情还有眼睛基本没做优化... 比起同类型二游3d这游戏明显运镜差了很多蜜汁镜头抖动眩晕感"`（`285792673600` - B站）
-  - `"The game is lagging even in the trailer😭. gg its joever for end devies yall"`（`UgzHW2FDpXRLztuXQ-h4AaABAg` - YT）
-- **战斗极度缺乏操作反馈和深度（代玩感）**
-  - `"They give you a parry system? And dodges? But the game hands you the perfect frame? And even slows time down? So you don’t miss your parries? When do you actually have fun? The game is playing for you."`（`UgxJZ-YGqU4JejxCDBt4AaABAg` - YT）
-- **面临海外严重的大世界抽卡游戏“同质化疲劳”**
-  - `"there is a millions games that look like this ..... all these Genshin copycat are getting tired and boring."`（`UgyX3Lj0dD8VobNRgtZ4AaABAg` - YT）
+### 2.2 游戏设计相关讨论焦点的情绪情况
+| 讨论焦点 (Top Topics) | 提及条数 | 提及率 | 该焦点内好评率 | 该焦点内差评率 |
+|---|---|---|---|---|
+| 信任与开发进度 (Trust/Progress) | 53 | 4.9% | 24.5% | 0.0% |
+| 核心玩法与战斗 (Gameplay Loop) | 44 | 4.1% | 45.4% | 9.1% |
+| 美术与视觉感知 (Art/Visual) | 32 | 3.0% | 75.0% | 0.0% |
+| 技术与优化 (Technical Quality) | 31 | 2.9% | 35.5% | 32.3% |
+| 世界观设定 (World Setting) | 18 | 1.7% | 50.0% | 5.6% |
 
-## Confidence and Limitations
-- YT 评论采样覆盖面较全，但 B 站部分评论存在“热评粉丝回声室效应”。
-- 海外舆情强烈受 “Gacha 模式疲劳” 大盘情绪影响，需在后续测试中剥离先入为主的情绪，去审视真实的玩法反馈。
+### 2.3 典型正面观点
+- **美术表现力与场景质感降维打击**：玩家对 UE5 带来的极致光追与场景美术表现感到震撼，认为其极大地拔高了二游的审美上限。
+  - `"雨水的流体效果和倒影真的绝了，目前二游真没见过这么敢做场景的"`（`285778058160`）
+  - `"这就是虚幻5的含金量吗，环境太能打了"`（`283808354465`）
+- **高活跃的“开发信任感”**：得益于项目组积极展示优化成果的沟通姿态，大量老粉与关注者给出了远超平均水平的宽容度。
+  - `"建模的确比一测的时候优化了太多，能看出制作组是真的有在听劝改的"`（`283807790273`）
+  - `"期待你们慢慢打磨，不要急着端上来半成品"`（`283910808993`）
 
-## Open Questions
-- 实机体验服中的动作逻辑（防反与精准闪避的惩罚过低）是否会导致中后期内容循环变得无聊？
-- 所谓的深层次“侦探机制”如何在常规的大世界跑图中兑现？
+### 2.4 典型负面观点/担忧点
+- **战斗动作与镜头调度的隐患**：玩家敏锐地观察到实机战斗中缺乏受击反馈、视角贴背过近以及诡异的运镜眩晕感。
+  - `"美术还是很生硬啊... 明显运镜差了很多蜜汁镜头抖动眩晕感"`（`285817106576`）
+- **性能与优化的严重担忧**：部分理智玩家指出，这种过于追求重度画质的做法必然导致移动端全面崩盘。
+  - `"场景这么花里胡哨，手机肯定带不动，这只能当个端游玩了"`（`283801671297`）
+
+---
+
+## 3. YouTube视频分析 (BS281osYsQw)
+
+### 3.1 总体情绪分布
+| 情绪维度 | 计数 | 占比 | 获赞权重估计 |
+|---|---|---|---|
+| 正面 (Positive) | 63 | 14.3% | 高 (音乐/氛围偏好) |
+| 中性 (Neutral) | 366 | 83.0% | 极大 (多数在观望) |
+| 负面 (Negative) | 12 | 2.7% | 低 |
+
+### 3.2 游戏设计相关讨论焦点的情绪情况
+| 讨论焦点 (Top Topics) | 提及条数 | 提及率 | 该焦点内好评率 | 该焦点内差评率 |
+|---|---|---|---|---|
+| 商业化与抽卡疲劳 (Monetization) | 49 | 11.2% | 20.4% | 2.0% |
+| 美术与视觉感知 (Art/Visual) | 25 | 5.7% | 44.0% | 4.0% |
+| 世界观设定 (World Setting) | 11 | 2.5% | 27.3% | 0.0% |
+| 核心玩法与战斗 (Gameplay Loop) | 11 | 2.5% | 9.1% | 18.2% |
+| 技术与优化 (Technical Quality) | 5 | 1.1% | 20.0% | 40.0% |
+
+### 3.3 典型正面观点
+- **顶级交响乐配乐与英伦美学极高辨识度**：开场古典乐与精妙的维多利亚设计让看腻了赛博宇宙的外网玩家感受到了强烈的古典美差异化。
+  - `"Handel’s Water Music: Suite No. 2 in D Major, HWV 349, II. Alla Hornpipe is 👌😘"`（`UgzK9-96VY51avouGep4AaABAg`）
+  - `"The art looks so good and the animations are really fluid too!"`（`Ugw-IlUJyj8vLtIfZQx4AaABAg`）
+- **类《重返未来:1999》受众的高度转化意愿**：凭借相似的世界观风格，成功吸引了一批竞品玩家对其3D表现力的期待。
+  - `"hopefully they go heavy on the detective theme, observation reminded me of tears of themis / reverse 1999"`（`UgyGo1JhdbLTthUO3RZ4AaABAg`）
+
+### 3.4 典型负面观点/担忧点
+- **极速蔓延的“二次元开放世界疲劳”与抽卡焦虑**：这在评论区形成了最主要的情感防线，大量用户对“又一个套皮抽卡原神替代品”表达了明确的兴致索然。
+  - `"there is a millions games that look like this ..... all these Genshin copycat are getting tired and boring."`（`UgyX3Lj0dD8VobNRgtZ4AaABAg`）
+  - `"I'll sit this one out to recover from my open world gacha fatique. The game does look gorgeous, good luck for all your pulls."`（`UgwEdAWw9yz8dph_Wsl4AaABAg`）
+- **战斗交互深度被质疑（全自动玩法的担忧）**：因为演示素材中大量充斥着慢动作和QTE提示，玩家认为核心战斗极无挑战性。
+  - `"They give you a parry system? And dodges? But the game hands you the perfect frame? And even slows time down? [...] The game is playing for you."`（`UgxJZ-YGqU4JejxCDBt4AaABAg`）
+- **设备配置灭霸（技术抛弃手机端）**：
+  - `"The game is lagging even in the trailer😭. gg its joever for end devies yall 🥀"`（`UgzHW2FDpXRLztuXQ-h4AaABAg`）
 
 ## 四、Section 3 主页与长评反馈详析
 
